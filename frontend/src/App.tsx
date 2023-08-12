@@ -1,13 +1,13 @@
-import { useEffect, useState } from "react";
-import "./App.css";
+import { useEffect, useState } from 'react';
+import './App.css';
+import { ChangeMessengerMessage } from './components/ChangeMessengerMessage';
+import { getMessengerMessage } from './fetchers/messenger';
 
 function App() {
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState();
 
   const getApiData = async () => {
-    const response = await fetch("http://localhost:20001/").then((response) =>
-      response.json()
-    );
+    const response = await getMessengerMessage();
     setMessage(response.message);
   };
 
@@ -18,6 +18,8 @@ function App() {
   return (
     <div>
       <h1>{message}</h1>
+
+      {message && <ChangeMessengerMessage currentMessage={message} />}
     </div>
   );
 }
