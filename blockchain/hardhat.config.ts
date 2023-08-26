@@ -33,6 +33,12 @@ const config: HardhatUserConfig = {
     polygon_mumbai: {
       url: process.env.POLYGON_MUMBAI_URL || '',
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : []
+    },
+    localhost: {
+      forking: {
+        url: 'https://bsc-dataseed.binance.org'
+      },
+      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : []
     }
   },
   gasReporter: {

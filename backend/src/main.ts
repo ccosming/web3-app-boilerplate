@@ -1,6 +1,8 @@
 import cors from 'cors';
 import dotenv from 'dotenv';
+import { ethers } from 'ethers';
 import express, { Express, Request, Response } from 'express';
+import { getCTokenContract } from './constracts/ctoken.contract';
 import { getMessengerContract } from './constracts/messenger.contract';
 
 dotenv.config();
@@ -8,7 +10,7 @@ dotenv.config();
 const app: Express = express();
 const port = process.env.PORT;
 
-app.options('*', cors());
+app.options('*', cors({ origin: '*' }));
 
 app.all('/*', function (req, res, next) {
   res.header('Access-Control-Allow-Origin', '*');
@@ -16,11 +18,9 @@ app.all('/*', function (req, res, next) {
   next();
 });
 
-app.get('/hello', async (req: Request, res: Response) => {
-  res.json({
-    message: 'Welcome to the Web3 🚀'
-  });
-});
+/**
+ * Messenger end-points.
+ */
 
 app.get('/messenger', async (req: Request, res: Response) => {
   const contract = getMessengerContract();
@@ -36,6 +36,38 @@ app.put('/messenger', async (req: Request, res: Response) => {
   const response = await contract.setMessage(message);
   res.json({
     message: response
+  });
+});
+
+/**
+ * CToken end-points.
+ */
+app.get('/ctoken/totalSupply', async (req: Request, res: Response) => {
+  const contract = getCTokenContract();
+  const response = await contract.totalSupply();
+
+  res.json({
+    totalSupply: ethers.formatEther(response)
+  });
+});
+
+app.get('/ctoken/balanceOf', async (req: Request, res: Response) => {
+  const contract = getCTokenContract();
+  const balanceOf = await contract.balanceOf(req.query.address);
+
+  res.json({
+    balanceOf: ethers.formatEther(balanceOf)
+  });
+});
+
+app.get('/ctoken/transfer', async (req: Request, res: Response) => {
+  const { address, amount } = req.query;
+
+  const contract = getCTokenContract();
+  const result = await contract.transfer(address, ethers.parseUnits(amount as string, 18));
+
+  res.json({
+    transfer: result
   });
 });
 
